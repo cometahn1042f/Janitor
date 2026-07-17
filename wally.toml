@@ -1,0 +1,10 @@
+[package]
+name = "cometahn/janitor"
+description = "Janitor For Roblox"
+version = "0.1.0"
+license = "MIT"
+registry = "https://github.com/UpliftGames/wally-index"
+realm = "shared"
+
+[dependencies]
+Promise = "cometahn1042f/promise@0.1.0"

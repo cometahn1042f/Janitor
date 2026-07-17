@@ -1,0 +1,14 @@
+{
+    "languageMode": "strict",
+    "lint": {
+        "*": true
+    },
+    "lintErrors": true,
+    "globals": [
+        "task",
+        "script"
+    ],
+    "aliases": {
+        "Promise": "../Promise/src"
+    }
+}
