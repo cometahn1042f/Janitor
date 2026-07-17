@@ -157,18 +157,20 @@ local function Remove(self: Private, index: any): Janitor
 							(object :: Instance):Destroy()
 						end
 					else
-						local destroy = (object :: any).Destroy
-						if destroy then
-							(destroy :: (any) -> ())(object)
+						local obj: any = object
+						if type(obj.Destroy) == "function" then
+							local callable: { Destroy: (any) -> () } = obj
+							callable:Destroy()
 						end
 					end
 				elseif methodName == "Disconnect" then
 					if typeof(object) == "RBXScriptConnection" then
 						(object :: RBXScriptConnection):Disconnect()
 					else
-						local disconnect = (object :: any).Disconnect
-						if disconnect then
-							(disconnect :: (any) -> ())(object)
+						local obj: any = object
+						if type(obj.Disconnect) == "function" then
+							local callable: { Disconnect: (any) -> () } = obj
+							callable:Disconnect()
 						end
 					end
 				else
@@ -437,18 +439,20 @@ local function Cleanup(self: Private): ()
 							(object :: Instance):Destroy()
 						end
 					else
-						local destroy = (object :: any).Destroy
-						if destroy then
-							(destroy :: (any) -> ())(object)
+						local obj: any = object
+						if type(obj.Destroy) == "function" then
+							local callable: { Destroy: (any) -> () } = obj
+							callable:Destroy()
 						end
 					end
 				elseif methodName == "Disconnect" then
 					if typeof(object) == "RBXScriptConnection" then
 						(object :: RBXScriptConnection):Disconnect()
 					else
-						local disconnect = (object :: any).Disconnect
-						if disconnect then
-							(disconnect :: (any) -> ())(object)
+						local obj: any = object
+						if type(obj.Disconnect) == "function" then
+							local callable: { Disconnect: (any) -> () } = obj
+							callable:Disconnect()
 						end
 					end
 				else
