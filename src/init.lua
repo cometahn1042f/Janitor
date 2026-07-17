@@ -1,6 +1,6 @@
 --!strict
 local fastDefer = require(script.fastDefer)
-local Promise = require(script.Promise)
+local Promise = require(script.Parent.Promise)
 type Promise = any
 
 local LinkToInstanceIndex = setmetatable({}, {
