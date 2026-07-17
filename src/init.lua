@@ -284,6 +284,7 @@ function Janitor:AddPromise(promiseObject: Promise, index: unknown?): Promise
 		if Get((self :: any) :: Private, uniqueId) == newPromise then
 			Remove((self :: any) :: Private, uniqueId)
 		end
+		return nil
 	end)
 
 	return newPromise :: never
