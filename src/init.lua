@@ -28,6 +28,12 @@ export type Janitor = typeof(setmetatable(
 			index: any?,
 			A...
 		) -> T,
+		AddPooled: <T>(
+			self: Janitor,
+			object: T,
+			pool: any,
+			returnMethodName: string?
+		) -> T,
 		AddPromise: (self: Janitor, promiseObject: Promise, index: unknown?) -> Promise,
 
 		Remove: (self: Janitor, index: any) -> Janitor,
@@ -43,6 +49,7 @@ export type Janitor = typeof(setmetatable(
 		Destroy: (self: Janitor) -> (),
 
 		LinkToInstance: (self: Janitor, Object: Instance, allowMultiple: boolean?) -> RBXScriptConnection,
+		LegacyLinkToInstance: (self: Janitor, Object: Instance, allowMultiple: boolean?) -> RBXScriptConnection,
 		LinkToInstances: (self: Janitor, ...Instance) -> Janitor,
 	},
 	{} :: { __call: (self: Janitor) -> () }
@@ -63,6 +70,12 @@ type Private = typeof(setmetatable(
 			index: any?,
 			A...
 		) -> T,
+		AddPooled: <T>(
+			self: Private,
+			object: T,
+			pool: any,
+			returnMethodName: string?
+		) -> T,
 		AddPromise: (self: Private, promiseObject: Promise, index: unknown?) -> Promise,
 
 		Remove: (self: Private, index: any) -> Private,
@@ -78,6 +91,7 @@ type Private = typeof(setmetatable(
 		Destroy: (self: Private) -> (),
 
 		LinkToInstance: (self: Private, object: Instance, allowMultiple: boolean?) -> RBXScriptConnection,
+		LegacyLinkToInstance: (self: Private, object: Instance, allowMultiple: boolean?) -> RBXScriptConnection,
 		LinkToInstances: (self: Private, ...Instance) -> Private,
 	},
 	{} :: { __call: (self: Private) -> () }
@@ -149,6 +163,11 @@ local function Remove(self: Private, index: any): Janitor
 					end
 				end
 			else
+				if type(object) ~= "table" and type(object) ~= "userdata" then
+					self[object] = nil
+					this[index] = nil
+					return (self :: any) :: Janitor
+				end
 				if methodName == "Destroy" then
 					if typeof(object) == "Instance" then
 						if self.SuppressInstanceReDestroy then
@@ -242,6 +261,14 @@ Private.Add = Add
 
 function Janitor:AddObject<T, A...>(constructor: { new: (A...) -> T }, methodName: BooleanOrString?, index: any?, ...: A...): T
 	return Add((self :: any) :: Private, constructor.new(...), methodName, index)
+end
+
+function Janitor:AddPooled<T>(object: T, pool: any, returnMethodName: string?): T
+	local methodName = returnMethodName or "Return"
+	Add((self :: any) :: Private, function()
+		pool[methodName](pool, object)
+	end, true, object)
+	return object
 end
 
 local function Get(self: Private, index: unknown): any?
@@ -431,6 +458,10 @@ local function Cleanup(self: Private): ()
 					end
 				end
 			else
+				if type(object) ~= "table" and type(object) ~= "userdata" then
+					self[object] = nil
+					continue
+				end
 				if methodName == "Destroy" then
 					if typeof(object) == "Instance" then
 						if self.SuppressInstanceReDestroy then
